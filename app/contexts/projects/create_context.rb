@@ -26,8 +26,17 @@ module Projects
       # Ex.
       #  'GitLab HQ'.parameterize => "gitlab-hq"
       #
-      @project.path = @project.name.dup.parameterize
-
+      #@project.path = @project.name.dup.parameterize
+      if Gitlab.config.gitlab.case_sensitive
+        parameterized_string = ActiveSupport::Inflector.transliterate(@project.name)
+        parameterized_string.gsub!(/[^a-z0-9\-_.]+/i, '-')
+        re_sep = Regexp.escape('-')
+        parameterized_string.gsub!(/#{re_sep}{2,}/, '-')
+        parameterized_string.gsub!(/^#{re_sep}|#{re_sep}$/i, '')
+        @project.path = parameterized_string
+      else
+        @project.path = @project.name.dup.parameterize
+      end
 
       if namespace_id
         # Find matching namespace and check if it allowed

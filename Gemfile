@@ -199,4 +199,5 @@ end
 
 group :production do
   gem "gitlab_meta", '5.0'
+  gem "mysql2"
 end
